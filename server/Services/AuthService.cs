@@ -11,23 +11,28 @@ public class AuthService
     private readonly IMongoCollection<User> _users;
     private readonly string _jwtSecret;
 
-    public AuthService(IOptions<MongoDbSettings> settings)
+    public AuthService(IOptions<MongoDbSettings> mongoSettings, IOptions<JwtSettings> jwtSettings)
     {
-        var client = new MongoClient(settings.Value.ConnectionString);
-        var db = client.GetDatabase(settings.Value.DatabaseName);
-        _users = db.GetCollection<User>(settings.Value.UserCollection);
-        _jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? settings.Value.JwtSecret ?? "default_secret";
+        var client = new MongoClient(mongoSettings.Value.ConnectionString);
+        var db = client.GetDatabase(mongoSettings.Value.DatabaseName);
+        _users = db.GetCollection<User>(mongoSettings.Value.UserCollection);
+
+        _jwtSecret = jwtSettings.Value.Secret ?? throw new ArgumentNullException("JWT secret is missing");
+
+        if (_jwtSecret.Length < 16)
+            throw new Exception("JWT secret must be at least 128 bits (16 characters) long.");
     }
 
     public async Task<string?> Register(string username, string email, string password)
     {
-        var existing = await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
+        var normalizedEmail = email.Trim().ToLower();
+        var existing = await _users.Find(u => u.Email == normalizedEmail).FirstOrDefaultAsync();
         if (existing != null) return null;
 
         var user = new User
         {
             Username = username,
-            Email = email,
+            Email = normalizedEmail,
             PasswordHash = PasswordHelper.HashPassword(password)
         };
 
@@ -37,7 +42,8 @@ public class AuthService
 
     public async Task<string?> Login(string email, string password)
     {
-        var user = await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
+        var normalizedEmail = email.Trim().ToLower();
+        var user = await _users.Find(u => u.Email == normalizedEmail).FirstOrDefaultAsync();
         if (user == null || !PasswordHelper.VerifyPassword(password, user.PasswordHash))
             return null;
 

@@ -6,12 +6,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Config from appsettings.json
+// Bind configs
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// Get JWT secret for Auth
 var jwtSecret = builder.Configuration["JwtSettings:Secret"];
 var key = Encoding.UTF8.GetBytes(jwtSecret!);
 
-// Add JWT auth
+// JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -28,7 +31,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Services
+// Register services with both config injections
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<TodoService>();
 
@@ -41,14 +44,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Start the app asynchronously
 await app.StartAsync();
 
-// Print the server URLs
 foreach (var url in app.Urls)
 {
     Console.WriteLine($"Server running on {url}");
 }
 
-// Wait for shutdown to keep app running
 await app.WaitForShutdownAsync();
