@@ -33,16 +33,22 @@ builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<TodoService>();
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-app.UseSwagger();
-app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.Run();
+
+// Start the app asynchronously
+await app.StartAsync();
+
+// Print the server URLs
+foreach (var url in app.Urls)
+{
+    Console.WriteLine($"Server running on {url}");
+}
+
+// Wait for shutdown to keep app running
+await app.WaitForShutdownAsync();
