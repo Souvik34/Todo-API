@@ -18,9 +18,22 @@ namespace TodoApp.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var token = await _authService.Register(request.Username, request.Email, request.Password);
-            if (token == null) return BadRequest("User already exists");
-            return Ok(new { token });
+            var result = await _authService.Register(request.Username, request.Email, request.Password);
+
+            if (result == null)
+                return BadRequest("User already exists");
+
+            return Ok(new
+            {
+                message = "Registration successful",
+                user = new
+                {
+                    userId = result.UserId,
+                    username = result.Username,
+                    email = result.Email
+                },
+                token = result.Token // optional: remove if you don't want to return it
+            });
         }
 
         [HttpPost("login")]
@@ -28,6 +41,7 @@ namespace TodoApp.API.Controllers
         {
             var token = await _authService.Login(request.Email, request.Password);
             if (token == null) return Unauthorized("Invalid credentials");
+
             return Ok(new { token });
         }
     }
