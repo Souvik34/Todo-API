@@ -1,9 +1,17 @@
-import React from 'react'
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import TodoPage from "./pages/Home";
 
-const App = () => {
+function App() {
   return (
-    <div>App</div>
-  )
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/todos" element={<TodoPage />} />
+      <Route path="*" element={<Login />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
