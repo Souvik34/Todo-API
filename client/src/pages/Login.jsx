@@ -1,20 +1,85 @@
-// src/pages/Login.js
-import { useNavigate } from 'react-router-dom';
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Formik, Form, useField } from 'formik';
+import { z } from 'zod';
+import { AiOutlineExclamationCircle } from 'react-icons/ai';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import api from '../api';
+
+// Zod schema
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+// Zod to Formik validator
+function validateWithZod(schema) {
+  return (values) => {
+    const result = schema.safeParse(values);
+    if (result.success) return {};
+    const errors = {};
+    result.error.errors.forEach((err) => {
+      const path = err.path[0];
+      errors[path] = err.message;
+    });
+    return errors;
+  };
+}
+
+// Reusable input with eye toggle & error display
+const InputField = ({ label, name, type = 'text' }) => {
+  const [field, meta] = useField(name);
+  const [showPassword, setShowPassword] = useState(false);
+  const hasError = meta.touched && meta.error;
+  const isPassword = type === 'password';
+
+  return (
+    <div>
+      <label htmlFor={name} className="block text-lg font-medium text-white">{label}</label>
+      <div className="relative mt-2">
+        <input
+          {...field}
+          id={name}
+          type={isPassword ? (showPassword ? 'text' : 'password') : type}
+          className={`block w-full rounded-md bg-white px-3 py-2 pr-12 text-base text-gray-900 placeholder:text-gray-400 
+            focus:outline-2 focus:outline-blue-600 ${hasError ? 'border-2 border-red-500' : ''}`}
+        />
+
+        {/* Password toggle icon */}
+        {isPassword && (
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-8 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+          >
+            {showPassword ? <FiEye size={20} /> : <FiEyeOff size={20} />}
+          </span>
+        )}
+
+        {/* Error icon */}
+        {hasError && (
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500">
+            <AiOutlineExclamationCircle size={20} />
+          </span>
+        )}
+      </div>
+
+      {hasError && <div className="text-bold text-red-700 mt-1">{meta.error}</div>}
+    </div>
+  );
+};
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (values, { setSubmitting }) => {
     try {
-      await api.post('/login', { email, password });
+      await api.post('/login', values);
       navigate('/');
     } catch (error) {
       alert('Login failed. Check your credentials.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -26,42 +91,28 @@ export default function Login() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={handleLogin} className="space-y-6 bg-white/20 backdrop-blur-md rounded-lg p-6 shadow-xl">
-          <div>
-            <label htmlFor="email" className="block text-lg font-medium text-white">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 placeholder:text-gray-400 focus:outline-2 focus:outline-blue-600"
-            />
-          </div>
+        <Formik
+          initialValues={{ email: '', password: '' }}
+          validate={validateWithZod(loginSchema)}
+          onSubmit={handleLogin}
+          validateOnBlur
+          validateOnChange
+        >
+          {({ isSubmitting }) => (
+            <Form className="space-y-6 bg-white/20 backdrop-blur-md rounded-lg p-6 shadow-xl" noValidate>
+              <InputField name="email" label="Email" type="email" />
+              <InputField name="password" label="Password" type="password" />
 
-          <div>
-            <label htmlFor="password" className="block text-lg font-medium text-white">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 placeholder:text-gray-400 focus:outline-2 focus:outline-blue-600"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white font-semibold transition"
-          >
-            Sign in
-          </button>
-        </form>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white font-semibold transition"
+              >
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
+              </button>
+            </Form>
+          )}
+        </Formik>
 
         <p className="mt-6 text-center text-white text-base">
           Not a member?{' '}
