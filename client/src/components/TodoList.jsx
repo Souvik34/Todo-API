@@ -1,4 +1,3 @@
-// src/components/TodoList.js
 import { useState, useEffect } from 'react';
 import api from '../api';
 
@@ -12,6 +11,7 @@ export default function TodoList() {
   }, []);
 
   const addTodo = async () => {
+    if (!text.trim()) return;
     const res = await api.post('/todos', { text });
     setTodos([...todos, res.data]);
     setText('');
@@ -26,36 +26,38 @@ export default function TodoList() {
   };
 
   return (
-    <div className="bg-white bg-opacity-20 backdrop-blur-md p-6 rounded-xl max-w-xl mx-auto mt-12 shadow-lg text-white transition-all duration-500">
-      <h2 className="text-2xl font-bold mb-4 text-center">Your Todos</h2>
-      <div className="flex mb-4">
+    <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl max-w-2xl mx-auto mt-16 shadow-2xl transition-all duration-500 text-white">
+      <h2 className="text-3xl font-extrabold mb-6 text-center tracking-wide drop-shadow-sm">📝 Your Todo List</h2>
+
+      <div className="flex items-center mb-6">
         <input
-          className="flex-1 px-4 py-2 rounded-l bg-white bg-opacity-30 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex-1 px-5 py-3 rounded-l-lg bg-white/30 placeholder-white text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Add a new todo..."
+          placeholder="What's on your mind?"
         />
         <button
           onClick={addTodo}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r transition"
+          className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-r-lg text-white font-semibold transition-all"
         >
           Add
         </button>
       </div>
-      <ul className="space-y-2">
+
+      <ul className="space-y-3">
         {todos.map(todo => (
           <li
             key={todo.id}
-            className={`bg-white bg-opacity-20 px-4 py-2 rounded flex justify-between items-center shadow-sm transition-all duration-300 ${
+            className={`bg-white/25 px-5 py-3 rounded-xl flex justify-between items-center shadow-md transition-all duration-300 ease-in-out ${
               animatingId === todo.id ? 'opacity-0 scale-95' : 'opacity-100'
             }`}
           >
-            <span>{todo.text}</span>
+            <span className="text-lg font-medium">{todo.text}</span>
             <button
               onClick={() => deleteTodo(todo.id)}
-              className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+              className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded-md font-medium transition"
             >
-              X
+              Delete
             </button>
           </li>
         ))}

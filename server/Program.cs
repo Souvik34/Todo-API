@@ -10,11 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-// Get JWT secret for Auth
+// JWT Setup
 var jwtSecret = builder.Configuration["JwtSettings:Secret"];
 var key = Encoding.UTF8.GetBytes(jwtSecret!);
 
-// JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -31,7 +30,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Register services with both config injections
+// ✅ Add CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.AllowAnyOrigin()      // Or use .WithOrigins("http://localhost:5173")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<TodoService>();
 
@@ -39,11 +48,15 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+// ✅ Use CORS before auth
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
+// Logging and start
 await app.StartAsync();
 
 foreach (var url in app.Urls)

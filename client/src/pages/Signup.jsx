@@ -6,6 +6,8 @@ import { z } from 'zod';
 import api from '../api';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
+import toast from 'react-hot-toast';
+
 
 // Zod schema
 const signupSchema = z
@@ -73,20 +75,25 @@ export default function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = async (values, { setSubmitting }) => {
-    try {
-      await api.post('/signup', {
-        email: values.email,
-        username: values.username,
-        password: values.password,
-      });
-      navigate('/');
-    } catch (error) {
-      alert('Signup failed. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+const handleSignup = async (values, { setSubmitting, setErrors }) => {
+  try {
+    console.log('Sending signup data:', values);
+    const res = await api.post('auth/signup', values);
+    console.log('Signup success:', res.data);
+    navigate('/login');
+  } catch (err) {
+    console.error('Signup error:', err);
+    const message = err.response?.data?.message || 'Signup failed';
+    toast.error(message);
+    // Keep only email-related error below the email input:
+    setErrors(prev => ({ ...prev, email: err?.response?.data?.field === 'email' ? message : undefined }));
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
+
 
   return (
     <div className="flex min-h-screen flex-col justify-center bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 px-6 py-12 lg:px-8">
