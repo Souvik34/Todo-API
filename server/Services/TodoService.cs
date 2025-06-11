@@ -41,15 +41,19 @@ public class TodoService
         return true;
     }
 
-    public async Task<bool> UpdateTodo(string id, string newTitle)
+   public async Task<bool> UpdateTodo(string id, string title, string description, bool isCompleted)
 {
+    var filter = Builders<Todo>.Filter.Eq(t => t.Id, id);
     var update = Builders<Todo>.Update
-        .Set(t => t.Title, newTitle)
-        .Set(t => t.UpdatedAt, DateTime.UtcNow);
+        .Set(t => t.Title, title)
+        .Set(t => t.Description, description)
+        .Set(t => t.IsCompleted, isCompleted)
+        .Set(t => t.UpdatedAt, DateTime.UtcNow); // Optional if you're tracking updates
 
-    var result = await _todos.UpdateOneAsync(t => t.Id == id, update);
+    var result = await _todos.UpdateOneAsync(filter, update);
     return result.ModifiedCount > 0;
 }
+
 
 }
 

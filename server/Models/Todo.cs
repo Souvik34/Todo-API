@@ -11,6 +11,9 @@ public class Todo
 
     public string UserId { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty; 
+
     public bool IsCompleted { get; set; } = false;
 
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]

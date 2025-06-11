@@ -69,6 +69,7 @@ public class TodosController : ControllerBase
     }
 
     [HttpPut("{id}")]
+[HttpPut("{id}")]
 public async Task<IActionResult> UpdateTodo(string id, [FromBody] UpdateTodoDto dto)
 {
     var userId = GetUserId();
@@ -77,9 +78,10 @@ public async Task<IActionResult> UpdateTodo(string id, [FromBody] UpdateTodoDto 
     if (string.IsNullOrWhiteSpace(dto.Title))
         return BadRequest(new { message = "Title cannot be empty" });
 
-    var success = await _todoService.UpdateTodo(id, dto.Title);
+    var success = await _todoService.UpdateTodo(id, dto.Title, dto.Description, dto.IsCompleted);
     if (!success) return NotFound(new { message = "Todo not found or update failed" });
 
     return Ok(new { message = "Todo updated successfully" });
 }
+
 }
