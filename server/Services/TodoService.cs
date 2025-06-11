@@ -40,4 +40,17 @@ public class TodoService
         await _todos.ReplaceOneAsync(t => t.Id == id, todo);
         return true;
     }
+
+    public async Task<bool> UpdateTodo(string id, string newTitle)
+{
+    var update = Builders<Todo>.Update
+        .Set(t => t.Title, newTitle)
+        .Set(t => t.UpdatedAt, DateTime.UtcNow);
+
+    var result = await _todos.UpdateOneAsync(t => t.Id == id, update);
+    return result.ModifiedCount > 0;
 }
+
+}
+
+

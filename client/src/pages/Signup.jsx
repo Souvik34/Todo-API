@@ -1,13 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Formik, Form, Field, ErrorMessage, useField } from 'formik';
+import { Formik, Form, useField } from 'formik';
 import { z } from 'zod';
 import api from '../api';
+import toast from 'react-hot-toast';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
-import toast from 'react-hot-toast';
-
 
 // Zod schema
 const signupSchema = z
@@ -36,7 +35,7 @@ function validateWithZod(schema) {
   };
 }
 
-// Custom input component with error icon
+// Custom input component
 const InputField = ({ label, name, type = 'text', showPasswordToggle, showPassword, setShowPassword }) => {
   const [field, meta] = useField(name);
   const hasError = meta.touched && meta.error;
@@ -66,7 +65,9 @@ const InputField = ({ label, name, type = 'text', showPasswordToggle, showPasswo
           </span>
         )}
       </div>
-      {hasError && <div className="text-sm font-bold text-red-700 mt-1">{meta.error}</div>}
+      {hasError && name === 'email' && (
+        <div className="text-sm font-bold text-red-700 mt-1">{meta.error}</div>
+      )}
     </div>
   );
 };
@@ -75,25 +76,25 @@ export default function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-const handleSignup = async (values, { setSubmitting, setErrors }) => {
-  try {
-    console.log('Sending signup data:', values);
-    const res = await api.post('auth/signup', values);
-    console.log('Signup success:', res.data);
-    navigate('/login');
-  } catch (err) {
-    console.error('Signup error:', err);
-    const message = err.response?.data?.message || 'Signup failed';
-    toast.error(message);
-    // Keep only email-related error below the email input:
-    setErrors(prev => ({ ...prev, email: err?.response?.data?.field === 'email' ? message : undefined }));
-  } finally {
-    setSubmitting(false);
-  }
-};
+  const handleSignup = async (values, { setSubmitting, setErrors }) => {
+    try {
+      console.log('Sending signup data:', values);
+      await api.post('auth/register', values);
+      toast.success('Signup successful! Please log in.');
+      navigate('/login');
+    } catch (err) {
+      console.error('Signup error:', err);
+      const message = err.response?.data?.message || 'Signup failed';
+      toast.error(message);
 
-
-
+      // Only set form field error if it's an email-specific issue
+      if (message.toLowerCase().includes('email')) {
+        setErrors({ email: message });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col justify-center bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 px-6 py-12 lg:px-8">

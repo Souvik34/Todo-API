@@ -34,8 +34,9 @@ namespace TodoApp.API.Services
             {
                 Username = username,
                 Email = normalizedEmail,
-                PasswordHash = PasswordHelper.HashPassword(password)
-            };
+                PasswordHash = PasswordHelper.HashPassword(password),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow};
 
             await _users.InsertOneAsync(user);
 

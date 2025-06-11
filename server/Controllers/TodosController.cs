@@ -3,7 +3,7 @@ using TodoApp.API.Services;
 using TodoApp.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-
+using TodoApp.API.Dtos;
 namespace TodoApp.API.Controllers;
 
 [ApiController]
@@ -67,4 +67,19 @@ public class TodosController : ControllerBase
             ? Ok(new { message = "Todo deleted successfully" })
             : NotFound(new { message = "Todo not found" });
     }
+
+    [HttpPut("{id}")]
+public async Task<IActionResult> UpdateTodo(string id, [FromBody] UpdateTodoDto dto)
+{
+    var userId = GetUserId();
+    if (userId == null) return Unauthorized(new { message = "User not authenticated" });
+
+    if (string.IsNullOrWhiteSpace(dto.Title))
+        return BadRequest(new { message = "Title cannot be empty" });
+
+    var success = await _todoService.UpdateTodo(id, dto.Title);
+    if (!success) return NotFound(new { message = "Todo not found or update failed" });
+
+    return Ok(new { message = "Todo updated successfully" });
+}
 }
