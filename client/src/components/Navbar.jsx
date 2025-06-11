@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import api from '../api';
+import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -11,11 +11,13 @@ export default function Navbar() {
     if (storedUsername) setUsername(storedUsername);
   }, []);
 
-  const logout = async () => {
-    await api.post('/logout');
-    localStorage.removeItem('username');
-    navigate('/login');
-  };
+ const logout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  toast.success('Logged out successfully');
+  navigate('/login');
+};
+
 
   return (
     <nav className="bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-600 px-8 py-4 shadow-md text-white flex justify-between items-center">
