@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import api from '../api';
+import toast from 'react-hot-toast';
 
 // Zod schema
 const loginSchema = z.object({
@@ -72,17 +73,25 @@ const InputField = ({ label, name, type = 'text' }) => {
 export default function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = async (values, { setSubmitting }) => {
-    try {
-      await api.post('/login', values);
-      navigate('/');
-    } catch (error) {
-      alert('Login failed. Check your credentials.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+ const handleLogin = async (values, { setSubmitting }) => {
+  try {
+    console.log('Sending login data:', values);
 
+    const res = await api.post('auth/login', values);
+    const { token, username } = res.data;
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('username', username);
+
+    toast.success('Login successful!');
+    navigate('/todos');
+  } catch (err) {
+    console.error('Login failed:', err);
+    toast.error(err.response?.data?.message || 'Login failed');
+  } finally {
+    setSubmitting(false);
+  }
+};
   return (
     <div className="flex min-h-screen flex-1 flex-col justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm text-center">
