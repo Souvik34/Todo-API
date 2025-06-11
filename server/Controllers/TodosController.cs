@@ -68,7 +68,7 @@ public class TodosController : ControllerBase
             : NotFound(new { message = "Todo not found" });
     }
 
-    [HttpPut("{id}")]
+ 
 [HttpPut("{id}")]
 public async Task<IActionResult> UpdateTodo(string id, [FromBody] UpdateTodoDto dto)
 {
