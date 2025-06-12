@@ -8,7 +8,7 @@ namespace TodoApp.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]  // Require authorization for all endpoints
+[Authorize]  
 public class TodosController : ControllerBase
 {
     private readonly TodoService _todoService;
@@ -41,7 +41,7 @@ public class TodosController : ControllerBase
             return BadRequest(new { message = "Todo title is required" });
 
         todo.UserId = userId;
-        todo.IsCompleted = false; // Default to false on creation
+        todo.IsCompleted = false; 
 
         var result = await _todoService.AddTodo(todo);
         return Ok(new { message = "Todo created successfully", todo = result });

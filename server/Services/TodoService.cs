@@ -48,7 +48,7 @@ public class TodoService
         .Set(t => t.Title, title)
         .Set(t => t.Description, description)
         .Set(t => t.IsCompleted, isCompleted)
-        .Set(t => t.UpdatedAt, DateTime.UtcNow); // Optional if you're tracking updates
+        .Set(t => t.UpdatedAt, DateTime.UtcNow); 
 
     var result = await _todos.UpdateOneAsync(filter, update);
     return result.ModifiedCount > 0;

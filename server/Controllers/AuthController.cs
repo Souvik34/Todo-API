@@ -32,7 +32,7 @@ namespace TodoApp.API.Controllers
                     username = result.Username,
                     email = result.Email
                 },
-                token = result.Token // optional: remove if you don't want to return it
+                token = result.Token 
             });
         }
 

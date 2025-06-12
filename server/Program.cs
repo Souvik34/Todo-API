@@ -30,12 +30,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ Add CORS Policy
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()      // Or use .WithOrigins("http://localhost:5173")
+        policy.AllowAnyOrigin()     
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -48,7 +48,6 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// ✅ Use CORS before auth
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
