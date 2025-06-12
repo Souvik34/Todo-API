@@ -29,7 +29,7 @@ export default function TodoList() {
     try {
       await api.delete(`/todos/${id}`);
       toast.success('Todo deleted');
-      setTodos(todos.filter(todo => todo.id !== id));
+      setTodos(prev => prev.filter(todo => todo.id !== id));
     } catch {
       toast.error('Failed to delete todo');
     }
@@ -39,7 +39,11 @@ export default function TodoList() {
     try {
       const res = await api.put(`/todos/${updatedTodo.id}`, updatedTodo);
       toast.success('Todo updated');
-      setTodos(todos.map(todo => todo.id === updatedTodo.id ? res.data : todo));
+      setTodos(prev =>
+        prev.map(todo =>
+          todo.id === updatedTodo.id ? res.data.todo ?? updatedTodo : todo
+        )
+      );
       setSelectedTodo(null);
     } catch {
       toast.error('Failed to update todo');
@@ -75,15 +79,17 @@ export default function TodoList() {
       <ul className="space-y-4">
         {todos.map(todo => (
           <li
-            key={todo.id}
+            key={todo.id || todo._id}
             className="bg-white/20 p-4 rounded-xl shadow-md flex justify-between items-start gap-4"
           >
             <div className="flex-1">
               <h3 className={`text-xl font-semibold ${todo.isCompleted ? 'line-through text-gray-300' : ''}`}>
                 {todo.title}
               </h3>
-              <p className="text-white/90">{todo.description}</p>
-              <p className="text-sm text-white/60 mt-1">
+              {todo.description && (
+                <p className="text-white/90 mt-1">{todo.description}</p>
+              )}
+              <p className="text-sm text-white/60 mt-2">
                 Created: {new Date(todo.createdAt).toLocaleString()}
               </p>
             </div>
