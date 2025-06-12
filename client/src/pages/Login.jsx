@@ -123,10 +123,10 @@ export default function Login() {
           )}
         </Formik>
 
-        <p className="mt-6 text-center text-white text-base">
-          Not a member?{' '}
+        <p className="mt-6 text-center text-white text-lg  font-bold">
+          New to TaskBite?{' '}
           <a href="/signup" className="font-semibold text-indigo-200 hover:text-white underline">
-            Join here!
+            Sign up now
           </a>
         </p>
       </div>
