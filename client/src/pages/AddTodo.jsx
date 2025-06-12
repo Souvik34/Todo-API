@@ -49,7 +49,7 @@ export default function AddTodo() {
               onChange={(e) => setDescription(e.target.value)}
             />
 
-            <label className="flex items-center gap-3 text-sm text-white">
+            <label className="flex items-center gap-3 text-xl text-white">
               <input
                 type="checkbox"
                 checked={isCompleted}

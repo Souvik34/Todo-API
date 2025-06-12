@@ -30,7 +30,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-600 px-6 md:px-12 py-4 shadow-lg text-white flex justify-between items-center">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-600 px-6 md:px-12 py-4 shadow-lg text-white flex justify-between items-center backdrop-blur">
+
       <Link
         to="/todos"
         className="text-2xl font-extrabold tracking-wide hover:text-indigo-200 transition duration-200"
