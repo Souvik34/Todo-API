@@ -4,10 +4,12 @@ import api from '../api';
 import toast from 'react-hot-toast';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import EditTodoModal from './EditTodoModal';
+import DeleteConfirm from './DeleteConfirm';
 
 export default function TodoList() {
   const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const [todoToDelete, setTodoToDelete] = useState(null); // For modal confirmation
 
   useEffect(() => {
     fetchTodos();
@@ -22,16 +24,16 @@ export default function TodoList() {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirm = window.confirm('Are you sure you want to delete this todo?');
-    if (!confirm) return;
-
+  const confirmDelete = async () => {
+    if (!todoToDelete) return;
     try {
-      await api.delete(`/todos/${id}`);
+      await api.delete(`/todos/${todoToDelete.id}`);
       toast.success('Todo deleted');
-      setTodos(prev => prev.filter(todo => todo.id !== id));
+      setTodos(prev => prev.filter(todo => todo.id !== todoToDelete.id));
     } catch {
       toast.error('Failed to delete todo');
+    } finally {
+      setTodoToDelete(null);
     }
   };
 
@@ -112,7 +114,7 @@ export default function TodoList() {
                     <FaEdit size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(todo.id)}
+                    onClick={() => setTodoToDelete(todo)}
                     title="Delete"
                     className="text-red-300 hover:text-red-500 transition"
                   >
@@ -129,6 +131,13 @@ export default function TodoList() {
             todo={selectedTodo}
             onClose={() => setSelectedTodo(null)}
             onSave={handleEditSave}
+          />
+        )}
+
+        {todoToDelete && (
+          <DeleteConfirm
+            onConfirm={confirmDelete}
+            onCancel={() => setTodoToDelete(null)}
           />
         )}
       </div>
