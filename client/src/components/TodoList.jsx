@@ -198,7 +198,7 @@ export default function TodoList() {
             todo={selectedTodo}
             onClose={() => setSelectedTodo(null)}
             onSave={handleEditSave}
-            readOnly={selectedTodo.isCompleted} // 👈 Pass readOnly for completed todos
+            readOnly={selectedTodo.isCompleted} 
             animated
           />
         )}

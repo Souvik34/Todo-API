@@ -85,14 +85,14 @@ const handleSignup = async (values, { setSubmitting, setErrors }) => {
   } catch (err) {
     console.error('Signup error:', err);
 
-    // Handle string or object error messages
+
     const rawData = err.response?.data;
     const message =
       typeof rawData === 'string'
         ? rawData
         : rawData?.message || 'Signup failed';
 
-    // Show toast with message from backend
+
     toast.error(message);
 
     // Set field-specific errors if possible
