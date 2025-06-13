@@ -76,25 +76,36 @@ export default function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = async (values, { setSubmitting, setErrors }) => {
-    try {
-      console.log('Sending signup data:', values);
-      await api.post('auth/register', values);
-      toast.success('Signup successful! Please log in.');
-      navigate('/login');
-    } catch (err) {
-      console.error('Signup error:', err);
-      const message = err.response?.data?.message || 'Signup failed';
-      toast.error(message);
+const handleSignup = async (values, { setSubmitting, setErrors }) => {
+  try {
+    console.log('Sending signup data:', values);
+    await api.post('auth/register', values);
+    toast.success('Signup successful! Please log in.');
+    navigate('/login');
+  } catch (err) {
+    console.error('Signup error:', err);
 
-      // Only set form field error if it's an email-specific issue
-      if (message.toLowerCase().includes('email')) {
-        setErrors({ email: message });
-      }
-    } finally {
-      setSubmitting(false);
+    // Handle string or object error messages
+    const rawData = err.response?.data;
+    const message =
+      typeof rawData === 'string'
+        ? rawData
+        : rawData?.message || 'Signup failed';
+
+    // Show toast with message from backend
+    toast.error(message);
+
+    // Set field-specific errors if possible
+    if (message.toLowerCase().includes('email')) {
+      setErrors({ email: message });
+    } else if (message.toLowerCase().includes('user')) {
+      setErrors({ username: message });
     }
-  };
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <div className="flex min-h-screen flex-col justify-center bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 px-6 py-12 lg:px-8">

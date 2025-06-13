@@ -2,7 +2,15 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import toast from 'react-hot-toast';
-import { FaEdit, FaTrash, FaPlus, FaClock, FaCheckCircle, FaCalendarAlt } from 'react-icons/fa';
+import {
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaClock,
+  FaCheckCircle,
+  FaCalendarAlt,
+  FaEye,
+} from 'react-icons/fa';
 import EditTodoModal from './EditTodoModal';
 import DeleteConfirm from './DeleteConfirm';
 
@@ -127,23 +135,32 @@ export default function TodoList() {
               >
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className={`text-xl font-bold ${
-                      todo.isCompleted ? 'line-through text-gray-300' : 'text-white'
-                    }`}>
+                    <h3
+                      className={`text-xl font-bold ${
+                        todo.isCompleted
+                          ? 'line-through text-gray-300'
+                          : 'text-white'
+                      }`}
+                    >
                       {todo.title}
                     </h3>
 
-                    <span className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide shadow-md flex items-center gap-1 ${
-                      todo.isCompleted
-                        ? 'bg-green-400 text-white shadow-green-500/50'
-                        : 'bg-yellow-300 text-black shadow-yellow-500/40'
-                    }`}>
-                      {todo.isCompleted ? <FaCheckCircle /> : <FaClock />} {todo.isCompleted ? 'Completed' : 'Pending'}
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide shadow-md flex items-center gap-1 ${
+                        todo.isCompleted
+                          ? 'bg-green-400 text-white shadow-green-500/50'
+                          : 'bg-yellow-300 text-black shadow-yellow-500/40'
+                      }`}
+                    >
+                      {todo.isCompleted ? <FaCheckCircle /> : <FaClock />}
+                      {todo.isCompleted ? 'Completed' : 'Pending'}
                     </span>
                   </div>
 
                   {todo.description && (
-                    <p className="mt-1 text-base text-white/90">{todo.description}</p>
+                    <p className="mt-1 text-base text-white/90">
+                      {todo.description}
+                    </p>
                   )}
 
                   <p className="mt-2 text-sm text-white/70 font-semibold flex items-center gap-1">
@@ -154,10 +171,14 @@ export default function TodoList() {
                 <div className="flex space-x-3 pt-1">
                   <button
                     onClick={() => setSelectedTodo(todo)}
-                    title="Edit"
+                    title={todo.isCompleted ? 'View' : 'Edit'}
                     className="text-blue-400 hover:text-blue-500 transition"
                   >
-                    <FaEdit size={18} />
+                    {todo.isCompleted ? (
+                      <FaEye size={18} />
+                    ) : (
+                      <FaEdit size={18} />
+                    )}
                   </button>
                   <button
                     onClick={() => setTodoToDelete(todo)}
@@ -177,6 +198,7 @@ export default function TodoList() {
             todo={selectedTodo}
             onClose={() => setSelectedTodo(null)}
             onSave={handleEditSave}
+            readOnly={selectedTodo.isCompleted} // 👈 Pass readOnly for completed todos
             animated
           />
         )}

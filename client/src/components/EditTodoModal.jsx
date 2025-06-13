@@ -1,9 +1,8 @@
 /* eslint-disable no-unused-vars */
-// EditTodoModal.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function EditTodoModal({ todo, onClose, onSave }) {
+export default function EditTodoModal({ todo, onClose, onSave, readOnly = false }) {
   const [title, setTitle] = useState(todo.title);
   const [description, setDescription] = useState(todo.description);
   const [isCompleted, setIsCompleted] = useState(todo.isCompleted);
@@ -36,7 +35,7 @@ export default function EditTodoModal({ todo, onClose, onSave }) {
           transition={{ type: 'spring', duration: 0.5, bounce: 0.25 }}
         >
           <h2 className="text-3xl font-extrabold text-center text-purple-700 mb-6 tracking-tight">
-            Edit Your Task
+            {readOnly ? 'View Todo' : 'Edit Your Task'}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -46,7 +45,10 @@ export default function EditTodoModal({ todo, onClose, onSave }) {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none transition"
+                disabled={readOnly}
+                className={`w-full px-4 py-2 rounded-lg border ${
+                  readOnly ? 'bg-gray-100 cursor-not-allowed' : 'border-gray-300 focus:ring-2 focus:ring-purple-500'
+                } focus:outline-none transition`}
                 placeholder="Enter task title"
               />
             </div>
@@ -57,7 +59,10 @@ export default function EditTodoModal({ todo, onClose, onSave }) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none transition"
+                disabled={readOnly}
+                className={`w-full px-4 py-2 rounded-lg border ${
+                  readOnly ? 'bg-gray-100 cursor-not-allowed' : 'border-gray-300 focus:ring-2 focus:ring-purple-500'
+                } focus:outline-none transition`}
                 placeholder="Add more context (optional)"
               />
             </div>
@@ -67,6 +72,7 @@ export default function EditTodoModal({ todo, onClose, onSave }) {
                 type="checkbox"
                 checked={isCompleted}
                 onChange={(e) => setIsCompleted(e.target.checked)}
+                disabled={readOnly}
                 className="h-5 w-5 text-purple-600 focus:ring-2 focus:ring-purple-500 rounded"
               />
               <span className="text-sm text-gray-700">Mark as Completed</span>
@@ -78,14 +84,17 @@ export default function EditTodoModal({ todo, onClose, onSave }) {
                 onClick={onClose}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-800 font-medium transition"
               >
-                Cancel
+                {readOnly ? 'Close' : 'Cancel'}
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold shadow-md transition"
-              >
-                Save Changes
-              </button>
+
+              {!readOnly && (
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold shadow-md transition"
+                >
+                  Save Changes
+                </button>
+              )}
             </div>
           </form>
         </motion.div>
